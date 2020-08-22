@@ -175,6 +175,7 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -497,7 +498,7 @@ buttonpress(XEvent *e)
 			arg.ui = 1 << i;
 		} else if (ev->x < x + blw)
 			click = ClkLtSymbol;
-		else if (ev->x > selmon->ww - TEXTW(stext))
+		else if (ev->x > selmon->ww - (int)TEXTW(stext))
 			click = ClkStatusText;
 		else
 			click = ClkWinTitle;
@@ -757,7 +758,11 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
+<<<<<<< HEAD
 	int x, w, sw = 0, tsw = 0;
+=======
+	int x, w, tw = 0;
+>>>>>>> 61bb8b2241d4db08bea4261c82e27cd9797099e7
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
@@ -772,6 +777,7 @@ drawbar(Monitor *m)
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
 		drw_setscheme(drw, scheme[SchemeNorm]);
+<<<<<<< HEAD
 		if ((token = strsep(&statustext, "|"))) {
 			sw = TEXTW(token) + sp + lrpad / 2;
 			drw_text(drw, m->ww - sw, 0, sw - (sp + lrpad / 2), bh, lrpad / 2, token, 0);
@@ -787,6 +793,10 @@ drawbar(Monitor *m)
 		tsw += sw;
 		drw_setscheme(drw, scheme[SchemeGap]);
 		drw_rect(drw, mid + TEXTW(centerstatus), 0, m->ww - (tsw + mid + TEXTW(centerstatus)), bh, 1, 0);
+=======
+		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
+		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
+>>>>>>> 61bb8b2241d4db08bea4261c82e27cd9797099e7
 	}
 	free(tofree);
 
@@ -810,6 +820,7 @@ drawbar(Monitor *m)
 	drw_setscheme(drw, scheme[SchemeGap]);
 	drw_rect(drw, x, 0, selmon->gappih, bh, 1, 0);
 	drw_setscheme(drw, scheme[SchemeNorm]);
+<<<<<<< HEAD
 	x = drw_text(drw, x + selmon->gappih, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 	drw_setscheme(drw, scheme[SchemeGap]);
 	drw_rect(drw, x, 0, mid - x, bh, 1, 0);
@@ -826,6 +837,21 @@ drawbar(Monitor *m)
 		//	drw_rect(drw, x, 0, w, bh, 1, 1);
 		//}
 //	}
+=======
+	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+
+	if ((w = m->ww - tw - x) > bh) {
+		if (m->sel) {
+			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+			if (m->sel->isfloating)
+				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+		} else {
+			drw_setscheme(drw, scheme[SchemeNorm]);
+			drw_rect(drw, x, 0, w, bh, 1, 1);
+		}
+	}
+>>>>>>> 61bb8b2241d4db08bea4261c82e27cd9797099e7
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
 
@@ -1722,7 +1748,7 @@ setmfact(const Arg *arg)
 	if (!arg || !selmon->lt[selmon->sellt]->arrange)
 		return;
 	f = arg->f < 1.0 ? arg->f + selmon->mfact : arg->f - 1.0;
-	if (f < 0.1 || f > 0.9)
+	if (f < 0.05 || f > 0.95)
 		return;
 	selmon->mfact = f;
 	arrange(selmon);
@@ -1913,6 +1939,7 @@ tile(Monitor *m)
 		mw = m->ww - 2*m->gappov*oe + m->gappiv*ie;
 	for (i = 0, my = ty = m->gappoh*oe, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if (i < m->nmaster) {
+<<<<<<< HEAD
 			r = MIN(n, m->nmaster) - i;
 			h = (m->wh - my - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
 			resize(c, m->wx + m->gappov*oe, m->wy + my, mw - (2*c->bw) - m->gappiv*ie, h - (2*c->bw), 0);
@@ -1922,6 +1949,17 @@ tile(Monitor *m)
 			h = (m->wh - ty - m->gappoh*oe - m->gappih*ie * (r - 1)) / r;
 			resize(c, m->wx + mw + m->gappov*oe, m->wy + ty, m->ww - mw - (2*c->bw) - 2*m->gappov*oe, h - (2*c->bw), 0);
 			ty += HEIGHT(c) + m->gappih*ie;
+=======
+			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
+			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+			if (my + HEIGHT(c) < m->wh)
+				my += HEIGHT(c);
+		} else {
+			h = (m->wh - ty) / (n - i);
+			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), 0);
+			if (ty + HEIGHT(c) < m->wh)
+				ty += HEIGHT(c);
+>>>>>>> 61bb8b2241d4db08bea4261c82e27cd9797099e7
 		}
 }
 
