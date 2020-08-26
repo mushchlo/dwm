@@ -821,16 +821,15 @@ drawbar(Monitor *m)
 	drw_rect(drw, x, 0, selmon->gappih, bh, 1, 0);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x + selmon->gappih, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
-	w = TEXTW(centerstatus);
-	drw_setscheme(drw, scheme[SchemeGap]);
-	drw_rect(drw, x, 0, mid - w/2, bh, 1, 0);
 
-/*	int modcount;
+	int modcount;
 	for(i=0;centerstatus[i];i++)
 		if(centerstatus[i]=="|")
 			modcount++;
 	int cx = mid - (TEXTW(centerstatus) + (modcount - 1)*selmon->gappih + modcount*lrpad - modcount*TEXTW("|")) / 2;
 	
+	drw_setscheme(drw, scheme[SchemeGap]);
+	drw_rect(drw, x, 0, cx, bh, 1, 0);
 	
 	tsw = 0;
 	while ((token = strsep(&centerstatus, "|"))) {
@@ -842,7 +841,7 @@ drawbar(Monitor *m)
 		tsw += sw + selmon->gappih;
         }
 	free(tofree2);
-        while ((token = strsep(&centerstatus, "|"))) {
+/*        while ((token = strsep(&centerstatus, "|"))) {
                 tsw += sw;
                 drw_setscheme(drw, scheme[SchemeGap]);
                 drw_rect(drw, m->ww - (tsw + selmon->gappih), 0, selmon->gappih, bh, 1, 0);
@@ -851,8 +850,9 @@ drawbar(Monitor *m)
                 drw_text(drw, m->ww - (sw + tsw), 0, sw - selmon->gappih, bh, lrpad / 2, token, 0);
         }
         tsw += sw;*/
+	w = TEXTW(centerstatus);
 	drw_setscheme(drw, scheme[SchemeNorm]);
-	drw_text(drw, mid, 0, w, bh, lrpad / 2, centerstatus, 0);
+	drw_text(drw, mid, 0, w, bh, lrpad / 2, /*centerstatus*/cx, 0);
 	
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
