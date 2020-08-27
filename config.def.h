@@ -39,7 +39,7 @@ static const char *const autostart[] = {
 	"sh", "-c", "feh --bg-fill /home/chloe/wallpaper.jpg", NULL,
         "sh", "-c", "dwmblocks", NULL,
         "sh", "-c", "xbindkeys", NULL,
-        "sh", "-c", "picom --experimental-backends", NULL,
+        "sh", "-c", "picom", NULL,
         NULL
 };
 
